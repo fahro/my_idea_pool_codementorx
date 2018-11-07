@@ -35,11 +35,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """
-    An abstract base class implementing a fully featured User model with
-    admin-compliant permissions.
- 
-    """
+
     email = models.EmailField(max_length=40, unique=True)
     name = models.CharField(max_length=30, blank=True)
     avatar_url = models.URLField()
@@ -53,5 +49,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name',]
  
     def save(self, *args, **kwargs):
+        self.avatar_url=Gravatar(self.email).get_image()
         super(User, self).save(*args, **kwargs)
         return self
