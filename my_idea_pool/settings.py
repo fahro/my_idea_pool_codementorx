@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'users',
+    'ideas',
 ]
 
 MIDDLEWARE = [
@@ -124,13 +125,22 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
   'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+        'users.authentication.MyJWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+   ),
+   # return DateTime field as unix timestamp in seconds
+    'DATETIME_FORMAT': '%s', 
 }
+
 
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'BLACKLIST_AFTER_ROTATION':True,
+    'AUTH_HEADER_TYPES': ('',),
+    'SIGNING_KEY': SECRET_KEY,
+    'USER_ID_CLAIM': 'id',
 }

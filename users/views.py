@@ -3,9 +3,12 @@ from .serializers import UserSerializer,MyTokenObtainPairSerializer,MyTokenRefre
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 from rest_framework.generics import DestroyAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated,AllowAny
+
 
 class CreateUserAPIView(APIView):
-    
+    permission_classes = (AllowAny,)
+
 
     def post(self, request):
         user = request.data
@@ -28,9 +31,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
        
         serializer  = BlackListTokenSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            print("START",serializer.validated_data['refresh_token'])
             refresh_token= serializer.validated_data['refresh_token']
-            print("HEY")
             refresh_token.blacklist()
             print(refresh_token)
             return Response(status=status.HTTP_204_NO_CONTENT)

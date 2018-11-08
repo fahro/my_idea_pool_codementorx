@@ -18,11 +18,8 @@ class BlackListTokenSerializer(serializers.Serializer):
     refresh_token = serializers.CharField()
    
     def validate(self,attrs):
-        print("HEY!")
         try:
-            print("REFRESH:",attrs['refresh_token'])
             refresh_token = RefreshToken(attrs['refresh_token'])
-            print("HELLLLOOOO!")
         except:
             raise serializers.ValidationError(
                 ('Invalid or expired token'),
@@ -34,6 +31,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super(MyTokenObtainPairSerializer, cls).get_token(user)
+        token['name']=user.name
+        token['email']=user.email
         return token
 
     def validate(self, attrs):
@@ -45,7 +44,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             )
 
         refresh = self.get_token(self.user[0])
-        print("REFRESH",refresh)
         data = {}
 
         data['jwt'] = text_type(refresh.access_token)
