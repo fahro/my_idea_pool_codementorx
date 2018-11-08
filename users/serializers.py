@@ -14,6 +14,20 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
 
+class BlackListTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()
+   
+    def validate(self,attrs):
+        print("HEY!")
+        try:
+            print("REFRESH:",attrs['refresh_token'])
+            refresh_token = RefreshToken(attrs['refresh_token'])
+            print("HELLLLOOOO!")
+        except:
+            raise serializers.ValidationError(
+                ('Invalid or expired token'),
+            )
+        return {'refresh_token':refresh_token}
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
@@ -23,16 +37,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        print(attrs['email'])
-        self.user = User.objects.get(email=attrs['email'],password=attrs['password'])
-        print(self.user)
+        self.user = User.objects.filter(email=attrs['email'],password=attrs['password'])
 
-        if self.user is None:
+        if not self.user:
             raise serializers.ValidationError(
                 ('No active account found with the given credentials'),
             )
 
-        refresh = self.get_token(self.user)
+        refresh = self.get_token(self.user[0])
+        print("REFRESH",refresh)
         data = {}
 
         data['jwt'] = text_type(refresh.access_token)
@@ -44,14 +57,20 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenRefreshSerializer(serializers.Serializer):
     refresh_token = serializers.CharField()
     def validate(self, attrs):
-        refresh_token = RefreshToken(attrs['refresh_token'])
+        try:
+            refresh_token = RefreshToken(attrs['refresh_token'])
+        except:
+            raise serializers.ValidationError(
+                ('Invalid or expired token'),
+            )
+      
 
         data = {'jwt': text_type(refresh_token.access_token)}
 
 
-        refresh_token.set_jti()
-        refresh_token.set_exp()
-
-        data['refresh_token'] = text_type(refresh_token)
+        #refresh_token.set_jti()
+        #refresh_token.set_exp()
+        #data['refresh_token'] = text_type(refresh_token)
 
         return data
+
