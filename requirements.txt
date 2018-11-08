@@ -9,4 +9,3 @@ psycopg2==2.7.5
 PyJWT==1.6.4
 pytz==2018.7
 whitenoise==4.1
-psycopg2
