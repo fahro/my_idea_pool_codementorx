@@ -24,7 +24,8 @@ SECRET_KEY = '8#a84nst6hk=2=6z0sm9@dh4n9hs-l9e0g!601fdh($n0+=f+^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['my-idea-pool-codementor.herokuapp.com']
+ALLOWED_HOSTS = ['my-idea-pool-codementor.herokuapp.com','localhost'
+]
 
 
 # Application definition

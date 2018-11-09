@@ -6,6 +6,7 @@ from .serializers import IdeaSerializerPost,IdeaSerializerGet,IdeaSerializerPut
 import jwt
 from my_idea_pool.settings import SECRET_KEY
 
+from django.shortcuts import  get_object_or_404
 import operator
 
 class IdeaView(APIView):
@@ -26,34 +27,28 @@ class IdeaView(APIView):
         return Response(serilazer.data)
 
     def post(self, request, format=None ): 
-      
-      
         access_token = request.META.get('HTTP_X_ACCESS_TOKEN')
         decoded = jwt.decode(access_token,SECRET_KEY)
         data=request.data.copy()
         data['user_id'] = decoded['id']
         serializer = IdeaSerializerPost(data=data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-
+        idea = serializer.save()
+        serializer = IdeaSerializerGet(idea)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
-    def put(self, request, pk, format=None):
-        idea = Idea.objects.get(id=pk)
-        idea.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
     def put(self, request, pk, format=None):
         idea = Idea.objects.get(id=pk)
         serializer = IdeaSerializerPut(idea, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            idea = serializer.save()
+            serializer = IdeaSerializerGet(idea)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        idea = Idea.objects.get(id=pk)
+        idea = get_object_or_404(Idea,pk=pk)
         idea.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
