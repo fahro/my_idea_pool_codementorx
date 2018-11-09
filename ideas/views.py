@@ -40,7 +40,9 @@ class IdeaView(APIView):
 
 
     def put(self, request, pk, format=None):
-        idea = Idea.objects.get(id=pk)
+        access_token = request.META.get('HTTP_X_ACCESS_TOKEN')
+        decoded = jwt.decode(access_token,SECRET_KEY)
+        idea = get_object_or_404(Idea,pk=pk,user_id=decoded['id'])
         serializer = IdeaSerializerPut(idea, data=request.data)
         if serializer.is_valid():
             idea = serializer.save()
@@ -49,6 +51,8 @@ class IdeaView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        idea = get_object_or_404(Idea,pk=pk)
+        access_token = request.META.get('HTTP_X_ACCESS_TOKEN')
+        decoded = jwt.decode(access_token,SECRET_KEY)
+        idea = get_object_or_404(Idea,pk=pk,user_id=decoded['id'])
         idea.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
