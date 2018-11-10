@@ -17,13 +17,18 @@ class IdeaView(APIView):
         decoded = jwt.decode(access_token,SECRET_KEY)
         ideas = Idea.objects.filter(user_id=decoded['id'])
         try:
-            page = int(self.request.query_params.get('page'))
-            if page is None or page<0:
+            page = self.request.query_params.get('page')
+            if page is None:
+                page=0
+            elif int(page)<0:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+            else:
+                page=int(page)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         ideas = sorted(ideas,key=operator.attrgetter('average_score'),reverse=True )[(page-1)*10:page*10]
         serilazer = IdeaSerializerGet(ideas,many=True)
+        print(serilazer.data)
         return Response(serilazer.data)
 
     def post(self, request, format=None ): 
