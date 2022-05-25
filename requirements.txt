@@ -6,6 +6,6 @@ djangorestframework-simplejwt==3.2.3
 gunicorn==19.9.0
 libgravatar==0.2.3
 psycopg2==2.7.5
-PyJWT==1.6.4
+PyJWT==2.4.0
 pytz==2018.7
 whitenoise==4.1
